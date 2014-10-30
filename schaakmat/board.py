@@ -73,12 +73,12 @@ INITIAL_BOARD = (
 
 
 def to_index(notation):
-    """Return an index location for an algebraic notation (e.g., "A8" -> 0)"""
+    """Return an index location for an algebraic notation (e.g., 'A8' -> 0)"""
     letter, number = notation[0].upper(), int(notation[1])
     return (ord(letter)-65) + (-(number-8) * 8)
 
 
 def to_notation(index):
-    """Return an algebraic notation for an index position (e.g., 63 -> "H1")"""
+    """Return an algebraic notation for an index position (e.g., 63 -> 'H1')"""
     remainder, quotient = divmod(index, 8)
     return chr(remainder+65) + str(-(quotient-8))
