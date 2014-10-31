@@ -22,13 +22,18 @@ from collections import namedtuple
 # Position is a class that can hold data about the state of a chess game. It
 # somewhat matches Forsytch-Edwards Notation in both state contents and order.
 #
-# board - TODO
-# whites_turn - Boolean value of whether the current turn is white's turn.
+# IMPORTANT: A chess position is a *state*, not a location.
+#
+# board - 64-character string that holds the board pieces as Unicode or ASCII
+#         characters, and empty squares as spaces. The first character is A8 on
+#         the chess board.
+# BLACK_turn - Boolean value of whether the current turn is white's turn.
 # white_castling - Sequence of two boolean values that determine the kingside
 #                  and queenside castling rights of white.
 # black_castling - Sequence of two boolean values that determine the kingside
 #                  and queenside castling rights of black.
-# en_passant_target - TODO
+# en_passant_target - Index position of the spot behind the pawn that can be
+#                     captured.
 # half_move_clock - Amount of half-moves since the last capture or pawn move.
 # move_count - Total amount of full moves.
 Position = namedtuple("Position", ["board", "whites_turn", "white_castling",
@@ -36,29 +41,49 @@ Position = namedtuple("Position", ["board", "whites_turn", "white_castling",
                                    "half_move_clock", "move_count"])
 
 KING_WHITE = '♔'
+KING_WHITE_ASCII = 'K'
 QUEEN_WHITE = '♕'
+QUEEN_WHITE_ASCII = 'Q'
 ROOK_WHITE = '♖'
+ROOK_WHITE_ASCII = 'R'
 BISHOP_WHITE = '♗'
+BISHOP_WHITE_ASCII = 'B'
 KNIGHT_WHITE = '♘'
+KNIGHT_WHITE_ASCII = 'N'
 PAWN_WHITE = '♙'
-WHITES = set([KING_WHITE, QUEEN_WHITE, ROOK_WHITE, BISHOP_WHITE, KNIGHT_WHITE,
-              PAWN_WHITE])
+PAWN_WHITE_ASCII = 'P'
+WHITES = set([
+    KING_WHITE, KING_WHITE_ASCII, QUEEN_WHITE, QUEEN_WHITE_ASCII, ROOK_WHITE,
+    ROOK_WHITE_ASCII, BISHOP_WHITE, BISHOP_WHITE_ASCII, KNIGHT_WHITE,
+    KNIGHT_WHITE_ASCII, PAWN_WHITE, PAWN_WHITE_ASCII
+])
 
 KING_BLACK = '♚'
+KING_BLACK_ASCII = 'k'
 QUEEN_BLACK = '♛'
+QUEEN_BLACK_ASCII = 'q'
 ROOK_BLACK = '♜'
+ROOK_BLACK_ASCII = 'r'
 BISHOP_BLACK = '♝'
+BISHOP_BLACK_ASCII = 'b'
 KNIGHT_BLACK = '♞'
+KNIGHT_BLACK_ASCII = 'n'
 PAWN_BLACK = '♟'
-BLACKS = set([KING_BLACK, QUEEN_BLACK, ROOK_BLACK, BISHOP_BLACK, KNIGHT_BLACK,
-              PAWN_BLACK])
+PAWN_BLACK_ASCII = 'p'
+BLACKS = set([
+    KING_BLACK, KING_BLACK_ASCII, QUEEN_BLACK, QUEEN_BLACK_ASCII, ROOK_BLACK,
+    ROOK_BLACK_ASCII, BISHOP_BLACK, BISHOP_BLACK_ASCII, KNIGHT_BLACK,
+    KNIGHT_BLACK_ASCII, PAWN_BLACK, PAWN_BLACK_ASCII
+])
 
-KINGS = set([KING_WHITE, KING_BLACK])
-QUEENS = set([QUEEN_WHITE, QUEEN_BLACK])
-ROOKS = set([ROOK_WHITE, ROOK_BLACK])
-BISHOPS = set([BISHOP_WHITE, BISHOP_BLACK])
-KNIGHTS = set([KNIGHT_WHITE, KNIGHT_BLACK])
-PAWNS = set([PAWN_WHITE, PAWN_BLACK])
+KINGS = set([KING_WHITE, KING_WHITE_ASCII, KING_BLACK, KING_BLACK_ASCII])
+QUEENS = set([QUEEN_WHITE, QUEEN_WHITE_ASCII, QUEEN_BLACK, QUEEN_BLACK_ASCII])
+ROOKS = set([ROOK_WHITE, ROOK_WHITE_ASCII, ROOK_BLACK, ROOK_BLACK_ASCII])
+BISHOPS = set([BISHOP_WHITE, BISHOP_WHITE_ASCII, BISHOP_BLACK,
+               BISHOP_BLACK_ASCII])
+KNIGHTS = set([KNIGHT_WHITE, KNIGHT_WHITE_ASCII, KNIGHT_BLACK,
+               KNIGHT_BLACK_ASCII])
+PAWNS = set([PAWN_WHITE, PAWN_WHITE_ASCII, PAWN_BLACK, PAWN_BLACK_ASCII])
 
 INITIAL_BOARD = (
     "♜♞♝♛♚♝♞♜"  # 0-7
@@ -69,6 +94,17 @@ INITIAL_BOARD = (
     "        "  # 40-47
     "♙♙♙♙♙♙♙♙"  # 48-55
     "♖♘♗♕♔♗♘♖"  # 56-63
+)
+
+INITIAL_BOARD_ASCII = (
+    "rnbqkbnr"  # 0-7
+    "pppppppp"  # 8-15
+    "        "  # 16-23
+    "        "  # 24-31
+    "        "  # 32-39
+    "        "  # 40-47
+    "PPPPPPPP"  # 48-55
+    "RNBQKBNR"  # 56-63
 )
 
 
