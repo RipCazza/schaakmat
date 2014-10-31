@@ -40,6 +40,8 @@ Position = namedtuple("Position", ["board", "whites_turn", "white_castling",
                                    "black_castling", "en_passant_target",
                                    "half_move_clock", "move_count"])
 
+TeamContainer = namedtuple("TeamContainer", ["active_team", "opposing_team"])
+
 KING_WHITE = '♔'
 KING_WHITE_ASCII = 'K'
 QUEEN_WHITE = '♕'
@@ -108,6 +110,42 @@ INITIAL_BOARD_ASCII = (
 )
 
 
+def get_teams(whites_turn):
+    if whites_turn:
+        return TeamContainer(WHITES, BLACKS)
+    else:
+        return TeamContainer(BLACKS, WHITES)
+
+
+def opponent(team):
+    if team is WHITES:
+        return BLACKS
+    else:
+        return WHITES
+
+
+def is_move_legal(from_index, to_index, position):
+    active_team, opposing_team = get_teams(position.whites_turn)
+    from_piece = position.board[from_index].strip()
+    to_piece = position.board[to_index].strip()
+
+    if from_piece in opposing_team or not from_piece:
+        return False
+
+    return True
+
+
+def move(from_index, to_index, position):
+    active_team, opposing_team = get_teams(position.whites_turn)
+    from_piece = position.board[from_index].strip()
+
+    if is_move_legal(from_index, from_piece, to_index, to_piece, position,
+                     active_team, opposing_team):
+        return Position()  # TODO
+    else:
+        raise Exception()  # TODO
+
+
 def to_index(notation):
     """Return an index location for an algebraic notation (e.g., 'A8' -> 0)"""
     letter, number = notation[0].upper(), int(notation[1])
@@ -117,4 +155,4 @@ def to_index(notation):
 def to_notation(index):
     """Return an algebraic notation for an index position (e.g., 63 -> 'H1')"""
     remainder, quotient = divmod(index, 8)
-    return chr(remainder+65) + str(-(quotient-8))
+    return chr(quotient+65) + str(-(remainder-8))
