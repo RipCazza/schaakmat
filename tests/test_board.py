@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # Schaakmat is a chess engine.
 # Copyright (C) 2014  Ruben Bakker <rubykuby@gmail.com>
@@ -17,25 +17,50 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from unittest import mock
-except ImportError:
-    import mock
+from __future__ import unicode_literals
 import unittest
 from schaakmat import board
 
 
 class TestBoard(unittest.TestCase):
 
-    def test_get_teams(self):
-        self.assertEqual(board.get_teams(whites_turn=True), (board.WHITES,
-                                                             board.BLACKS))
-        self.assertEqual(board.get_teams(whites_turn=False), (board.BLACKS,
-                                                              board.WHITES))
+    def test_get_piece(self):
+        self.assertEqual(board.get_piece(0, board.INITIAL_BOARD), "♜")
+        self.assertFalse(board.get_piece(16, board.INITIAL_BOARD))
+
+    def test_active_team(self):
+        self.assertEqual(board.active_team(whites_turn=True), board.WHITES)
+        self.assertEqual(board.active_team(whites_turn=False), board.BLACKS)
 
     def test_opponent(self):
         self.assertEqual(board.opponent(board.WHITES), board.BLACKS)
         self.assertEqual(board.opponent(board.BLACKS), board.WHITES)
+
+    def test_directions(self):
+        self.assertEqual(board.directions(board.WHITES),
+                         board.DIRECTIONS_WHITE)
+        self.assertEqual(board.directions(board.BLACKS),
+                         board.DIRECTIONS_BLACK)
+
+    def test_castling_rights(self):
+        self.assertIs(board.castling_rights(board.WHITES,
+                                            board.INITIAL_POSITION),
+                      board.INITIAL_POSITION.castling_white)
+        self.assertIs(board.castling_rights(board.BLACKS,
+                                            board.INITIAL_POSITION),
+                      board.INITIAL_POSITION.castling_black)
+
+    def test_legal_moves(self):
+        pass
+
+    def test_besieged(self):
+        pass
+
+    def test_is_check(self):
+        pass
+
+    def test_is_move_legal(self):
+        pass
 
     def test_to_index(self):
         notations = [letter + str(number) for number in reversed(range(1, 9))
@@ -50,3 +75,9 @@ class TestBoard(unittest.TestCase):
 
         for index, notation in enumerate(notations):
             self.assertEqual(board.to_notation(index), notation)
+
+    def test__accessible_moves(self):
+        pass
+
+    def test__in_bounds(self):
+        pass
