@@ -54,7 +54,62 @@ class TestBoard(unittest.TestCase):
         pass
 
     def test_besieged(self):
-        pass
+        expected = set([i for i in range(16, 24)])
+        self.assertEqual(set(board.besieged(board.WHITES,
+                                            board.INITIAL_POSITION)),
+                         expected)
+
+    def test_besieged_rook_blocks(self):
+        test_board = (
+            "♜   ♚   "  # 0-7
+            "    ♙   "  # 8-15
+            "        "  # 16-23
+            "        "  # 24-31
+            "        "  # 32-39
+            "        "  # 40-47
+            "♙♙♙♙ ♙♙♙"  # 48-55
+            "♖♘♗♕♔♗♘♖"  # 56-63
+        )
+        position = board.Position(test_board, True,
+                                  board.CastlingRights(True, True),
+                                  board.CastlingRights(True, True), None, 0, 0)
+        expected = set([1, 2, 3, 5, 8, 11, 12, 13, 16, 24, 32, 40, 48])
+        self.assertEqual(set(board.besieged(board.WHITES, position)), expected)
+
+    def test_besieged_lone_queen(self):
+        test_board = (
+            "♕       "  # 0-7
+            "        "  # 8-15
+            "        "  # 16-23
+            "        "  # 24-31
+            "        "  # 32-39
+            "        "  # 40-47
+            "        "  # 48-55
+            "        "  # 56-63
+        )
+        position = board.Position(test_board, True,
+                                  board.CastlingRights(True, True),
+                                  board.CastlingRights(True, True), None, 0, 0)
+        expected = set([1, 2, 3, 4, 5, 6, 7, 8, 16, 24, 32, 40, 48, 56, 9, 18,
+                        27, 36, 45, 54, 63])
+        self.assertEqual(set(board.besieged(board.BLACKS, position)), expected)
+
+    def test_besieged_knight(self):
+        test_board = (
+            "        "  # 0-7
+            "        "  # 8-15
+            "        "  # 16-23
+            "        "  # 24-31
+            "        "  # 32-39
+            "    ♟ ♙ "  # 40-47
+            "        "  # 48-55
+            "     ♞  "  # 56-63
+        )
+        position = board.Position(test_board, True,
+                                  board.CastlingRights(True, True),
+                                  board.CastlingRights(True, True), None, 0, 0)
+        expected = set([46, 53, 51, 55])
+        self.assertEqual(set(board.besieged(board.WHITES, position)), expected)
 
     def test_is_check(self):
         pass

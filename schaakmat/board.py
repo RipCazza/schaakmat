@@ -18,30 +18,35 @@
 
 from __future__ import unicode_literals
 from collections import namedtuple
+from functools import reduce
 from itertools import count
 from operator import or_
 
 
-# Position is a class that can hold data about the state of a chess game. It
-# somewhat matches Forsytch-Edwards Notation in both state contents and order.
-#
-# IMPORTANT: A chess position is a *state*, not a location.
-#
-# board - 64-character string that holds the board pieces as Unicode
-#         characters, and empty squares as spaces. The first character is A8 on
-#         the chess board.
-# whites_turn - Boolean value of whether the current turn is white's turn.
-# castling_white - Sequence of two boolean values that determine the kingside
-#                  and queenside castling rights of white.
-# castling_black - Sequence of two boolean values that determine the kingside
-#                  and queenside castling rights of black.
-# en_passant_target - Index position of the spot behind the pawn that can be
-#                     captured.
-# half_move_clock - Amount of half-moves since the last capture or pawn move.
-# move_count - Total amount of full moves.
-Position = namedtuple("Position", ["board", "whites_turn", "castling_white",
-                                   "castling_black", "en_passant_target",
-                                   "half_move_clock", "move_count"])
+class Position(namedtuple("Position", ["board", "whites_turn",
+                                       "castling_white", "castling_black",
+                                       "en_passant_target", "half_move_clock",
+                                       "move_count"])):
+    """Position is a tuple that can hold data about the state of a chess game.
+    It somewhat matches Forsytch-Edwards Notation in both state contents and
+    order.
+
+    IMPORTANT: A chess position is a *state*, not a location.
+
+    board - 64-character string that holds the board pieces as Unicode
+            characters, and empty squares as spaces. The first character is A8
+            on the chess board.
+    whites_turn - Boolean value of whether the current turn is white's turn.
+    castling_white - Sequence of two boolean values that determine the kingside
+                     and queenside castling rights of white.
+    castling_black - Sequence of two boolean values that determine the kingside
+                     and queenside castling rights of black.
+    en_passant_target - Index position of the spot behind the pawn that can be
+                        captured.
+    half_move_clock - Amount of half-moves since the last capture or pawn move.
+    move_count - Total amount of full moves.
+    """
+    pass
 
 Move = namedtuple("Move", ["origin", "destination"])
 
@@ -103,9 +108,9 @@ DIRECTIONS_BLACK = {
 }
 
 NORTH_BORDER = set([i for i in range(8)])
-EAST_BORDER = set([i*8 for i in range(8)])
+EAST_BORDER = set([7+i*8 for i in range(8)])
 SOUTH_BORDER = set([i for i in range(56, 64)])
-WEST_BORDER = set([i*8+7 for i in range(8)])
+WEST_BORDER = set([i*8 for i in range(8)])
 
 INITIAL_BOARD = (
     "♜♞♝♛♚♝♞♜"  # 0-7
@@ -147,7 +152,7 @@ def castling_rights(team, position):
 
 
 def legal_moves(origin, position):
-    global EAST, WEST
+    global NORTH, EAST, SOUTH, WEST
 
     piece = get_piece(origin, position.board)
     team = active_team(position.whites_turn)
@@ -174,14 +179,23 @@ def legal_moves(origin, position):
 
 
 def besieged(team, position):
-    opposing_team = opponent(team)
+    global NORTH, EAST, SOUTH, WEST, KINGS, PAWNS
 
+    opposing_team = opponent(team)
     siege_set = set([])
 
     for i, piece in enumerate(position.board):
         if piece in opposing_team:
-            for move in _accessible_moves(i, position):
+            pawn = piece in PAWNS
+            king = piece in KINGS
+            for move in _accessible_moves(i, position, capture_moves=True):
                 destination = move.destination
+                if king or pawn:
+                    offset = move.origin - destination
+                    if offset in (NORTH*2, EAST*2, WEST*2, SOUTH*2):
+                        continue
+                    if pawn and offset in (NORTH, SOUTH):
+                        continue
                 if destination not in siege_set:
                     yield destination
                     siege_set.add(destination)
@@ -235,7 +249,7 @@ def to_notation(index):
     return chr(quotient+65) + str(-(remainder-8))
 
 
-def _accessible_moves(origin, position):
+def _accessible_moves(origin, position, capture_moves=False):
     """Generator that yields all plausible moves for a single piece."""
     global NORTH, NORTH_BORDER, EAST, SOUTH, SOUTH_BORDER, WEST, Move
 
@@ -251,23 +265,35 @@ def _accessible_moves(origin, position):
 
     for offset in directions(team)[piece]:
         for destination in count(origin + offset, offset):
+            # Piece in the bounds of the board?
+            if not _in_bounds(destination - offset, destination):
+                break
+
             destination_piece = get_piece(destination, position.board)
 
             # Destination occupied by piece of same colour?
             if destination_piece in team:
                 break
-            # Offset is a castling move and castling not possible/allowed?
-            if (king
-                    and (offset == EAST*2
-                         and get_piece(origin+EAST)
-                         and not castling_rights(team, position).kingside
-                         or
-                         offset == WEST*2
-                         and get_piece(origin+WEST)
-                         and get_piece(origin+WEST*3)
-                         and not castling_rights(team, position).queenside)):
-                break
+
+            if king:
+                # Offset is not a move that can capture?
+                if capture_moves and offset in (EAST*2, WEST*2):
+                    break
+                # Offset is a castling move and castling not possible/allowed?
+                if (offset == EAST*2
+                        and get_piece(origin+EAST, position.board)
+                        and not castling_rights(team, position).kingside
+                        or
+                        offset == WEST*2
+                        and get_piece(origin+WEST, position.board)
+                        and get_piece(origin+WEST*3, position.board)
+                        and not castling_rights(team, position).queenside):
+                    break
             if pawn:
+                # Offset is not a move that can capture?
+                if capture_moves and offset in (NORTH, NORTH*2, SOUTH,
+                                                SOUTH*2):
+                    break
                 # Offset is a vertical move forward and destination is an enemy
                 # piece?
                 if (destination_piece
@@ -289,13 +315,12 @@ def _accessible_moves(origin, position):
                     break
                 # Offset is a diagonal move and destination is not an enemy
                 # piece or destination is not an en passant target?
+                # Ignored if `capture_moves` is True.
                 if (offset in (NORTH+EAST, SOUTH+EAST, SOUTH+WEST, NORTH+EAST)
-                        and not destination_piece
-                        and destination != position.en_passant_target):
+                        and (not destination_piece
+                             or destination != position.en_passant_target)
+                        and not capture_moves):
                     break
-            # Piece in the bounds of the board?
-            if not _in_bounds(destination - offset, destination):
-                break
 
             # Move is legal.
             yield Move(origin, destination)
@@ -306,7 +331,7 @@ def _accessible_moves(origin, position):
 
             # The destination was a capture move and the direction is therefore
             # further blocked?
-            if destination_piece in opponent(team):
+            if destination_piece:
                 break
 
 
