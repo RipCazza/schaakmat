@@ -298,26 +298,28 @@ def _accessible_moves(origin, position, capture_moves=False):
                         and offset in (NORTH, NORTH*2, SOUTH, SOUTH*2)):
                     break
                 # Offset is a two-squares move forward and pawn is not in its
-                # initial spot? (White)
+                # initial spot?
                 if (offset == NORTH*2
                         and (get_piece(origin+NORTH, position.board)
-                             or origin not in [index+NORTH for index in
-                                               SOUTH_BORDER])):
-                    break
-                # Offset is a two-squares move forward and pawn is not in its
-                # initial spot? (Black)
-                if (offset == SOUTH*2
+                             or
+                             origin not in [index+NORTH for index in
+                                            SOUTH_BORDER])
+                        or
+                        offset == SOUTH*2
                         and (get_piece(origin+SOUTH, position.board)
-                             or origin not in [index+SOUTH for index in
-                                               NORTH_BORDER])):
+                             or
+                             origin not in [index+SOUTH for index in
+                                            NORTH_BORDER])):
                     break
                 # Offset is a diagonal move and destination is not an enemy
                 # piece or destination is not an en passant target?
                 # Ignored if `capture_moves` is True.
-                if (offset in (NORTH+EAST, SOUTH+EAST, SOUTH+WEST, NORTH+EAST)
+                if (not capture_moves
+                        and offset in (NORTH+EAST, SOUTH+EAST, SOUTH+WEST,
+                                       NORTH+EAST)
                         and (not destination_piece
-                             or destination != position.en_passant_target)
-                        and not capture_moves):
+                             or
+                             destination != position.en_passant_target)):
                     break
 
             # Move is legal.
