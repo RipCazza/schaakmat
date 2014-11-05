@@ -105,10 +105,10 @@ DIRECTIONS_BLACK = {
     PAWN_BLACK: set([SOUTH+EAST, SOUTH, SOUTH*2, SOUTH+WEST])
 }
 
-NORTH_BORDER = set([i for i in range(8)])
-EAST_BORDER = set([7+i*8 for i in range(8)])
-SOUTH_BORDER = set([i for i in range(56, 64)])
-WEST_BORDER = set([i*8 for i in range(8)])
+BORDER_NORTH = set([i for i in range(8)])
+BORDER_EAST = set([7+i*8 for i in range(8)])
+BORDER_SOUTH = set([i for i in range(56, 64)])
+BORDER_WEST = set([i*8 for i in range(8)])
 
 INITIAL_BOARD = (
     "♜♞♝♛♚♝♞♜"  # 0-7
@@ -249,7 +249,7 @@ def to_notation(index):
 
 def _accessible_moves(origin, position, capture_moves=False):
     """Generator that yields all plausible moves for a single piece."""
-    global NORTH, NORTH_BORDER, EAST, SOUTH, SOUTH_BORDER, WEST, Move
+    global NORTH, BORDER_NORTH, EAST, SOUTH, BORDER_SOUTH, WEST, Move
 
     piece = get_piece(origin, position.board)
     if piece in WHITES:
@@ -303,13 +303,13 @@ def _accessible_moves(origin, position, capture_moves=False):
                         and (get_piece(origin+NORTH, position.board)
                              or
                              origin not in [index+NORTH for index in
-                                            SOUTH_BORDER])
+                                            BORDER_SOUTH])
                         or
                         offset == SOUTH*2
                         and (get_piece(origin+SOUTH, position.board)
                              or
                              origin not in [index+SOUTH for index in
-                                            NORTH_BORDER])):
+                                            BORDER_NORTH])):
                     break
                 # Offset is a diagonal move and destination is not an enemy
                 # piece or destination is not an en passant target?
@@ -342,32 +342,32 @@ def _in_bounds(origin, destination):
     This function is extremely limited in scope, and should be considered an
     implementation detail.
     """
-    global EAST, EAST_BORDER, WEST, WEST_BORDER
+    global EAST, BORDER_EAST, WEST, BORDER_WEST
 
     # North illegal?
     if destination < 0:
         return False
     # East illegal?
-    if origin in EAST_BORDER and destination in WEST_BORDER:
+    if origin in BORDER_EAST and destination in BORDER_WEST:
         return False
     # Twice east illegal? (Knight)
-    if (destination in WEST_BORDER
-            and origin in [index+WEST for index in EAST_BORDER]
+    if (destination in BORDER_WEST
+            and origin in [index+WEST for index in BORDER_EAST]
             or
-            origin in EAST_BORDER
-            and destination in [index+EAST for index in WEST_BORDER]):
+            origin in BORDER_EAST
+            and destination in [index+EAST for index in BORDER_WEST]):
         return False
     # South illegal?
     if destination > 63:
         return False
     # West illegal?
-    if origin in WEST_BORDER and destination in EAST_BORDER:
+    if origin in BORDER_WEST and destination in BORDER_EAST:
         return False
     # Twice west illegal? (Knight)
-    if (destination in EAST_BORDER
-            and origin in [index+EAST for index in WEST_BORDER]
+    if (destination in BORDER_EAST
+            and origin in [index+EAST for index in BORDER_WEST]
             or
-            origin in WEST_BORDER
-            and destination in [index+WEST for index in EAST_BORDER]):
+            origin in BORDER_WEST
+            and destination in [index+WEST for index in BORDER_EAST]):
         return False
     return True
