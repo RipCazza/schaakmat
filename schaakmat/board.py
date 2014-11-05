@@ -18,9 +18,7 @@
 
 from __future__ import unicode_literals
 from collections import namedtuple
-from functools import reduce
-from itertools import count
-from operator import or_
+from itertools import chain, count
 
 
 class Position(namedtuple("Position", ["board", "whites_turn",
@@ -326,7 +324,7 @@ def _accessible_moves(origin, position, capture_moves=False):
             yield Move(origin, destination)
 
             # Piece cannot do multiple steps in the same direction?
-            if piece in reduce(or_, [KINGS, KNIGHTS, PAWNS]):
+            if piece in chain(KINGS, KNIGHTS, PAWNS):
                 break
 
             # The destination was a capture move and the direction is therefore
