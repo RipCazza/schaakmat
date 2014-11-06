@@ -216,14 +216,68 @@ def is_move_legal(move, position):
     return False
 
 
-def do_move(move, position, force=False):
-    team = active_team(position.whites_turn)
-    origin_piece = get_piece(move.origin, position.board)
-
+def do_move(move, position, force=False, promotion_piece=None):
     if force or is_move_legal(move, position):
-        return Position()  # TODO
+        pass
     else:
         raise Exception()  # TODO
+
+    origin, destination = move
+    team = active_team(position.whites_turn)
+    piece = get_piece(origin, position.board)
+    destination_piece = get_piece(destination, position.board)
+
+    board = _apply_move(move, position.board)
+    whites_turn = not position.whites_turn
+    castling_white = position.castling_white
+    castling_black = position.castling_black
+    en_passant_target = None
+    half_move_clock = position.half_move_clock + 1
+    move_count = position.move_count
+    if not position.whites_turn:
+        move_count += 1
+
+    if piece in KINGS:
+        offset = destination - origin
+        if offset == EAST*2:
+            board = _apply_move(Move(origin+EAST*3, origin+EAST), board)
+        elif offset == WEST*2:
+            board = _apply_move(Move(origin+WEST*4, origin+WEST), board)
+        if team is WHITES:
+            castling_white = CastlingRights(False, False)
+        else:
+            castling_black = CastlingRights(False, False)
+    elif piece in ROOKS:
+        if team is WHITES:
+            if origin % 8 == 0:
+                castling_white = CastlingRights(castling_white.kingside, False)
+            else:
+                castling_white = CastlingRights(False,
+                                                castling_white.queenside)
+        else:
+            if origin % 8 == 0:
+                castling_black = CastlingRights(castling_black.kingside, False)
+            else:
+                castling_black = CastlingRights(False,
+                                                castling_black.queenside)
+    elif piece in PAWNS:
+        offset = destination - origin
+        half_move_clock = 0
+        if offset == NORTH*2:
+            en_passant_target = destination + SOUTH
+        elif offset == SOUTH*2:
+            en_passant_target = destination + NORTH
+        elif offset in (NORTH+EAST, NORTH+WEST) and not destination_piece:
+            board = _clear(destination + SOUTH, board)
+        elif offset in (SOUTH+EAST, SOUTH+WEST) and not destination_piece:
+            board = _clear(destination + NORTH, board)
+        if destination in chain(BORDER_NORTH, BORDER_SOUTH):
+            board = _place_piece(destination, promotion_piece, board)
+    if destination_piece:
+        half_move_clock = 0
+
+    return Position(board, whites_turn, castling_white, castling_black,
+                    en_passant_target, half_move_clock, move_count)
 
 
 def to_index(notation):
@@ -362,3 +416,21 @@ def _in_bounds(origin, destination):
             and destination in [index+WEST for index in BORDER_EAST]):
         return False
     return True
+
+
+def _apply_move(move, board):
+    origin, destination = move
+    board = _place_piece(destination, board[origin], board)
+    if origin != destination:
+        board = _clear(origin, board)
+    return board
+
+
+def _place_piece(origin, piece, board):
+    if len(piece) != 1:
+        raise Exception()  # TODO
+    return "".join([board[:origin], piece, board[origin+1:]])
+
+
+def _clear(origin, board):
+    return "".join([board[:origin], " ", board[origin+1:]])
