@@ -14,5 +14,4 @@ env:
 install:
   - pip install tox
 
-# command to run tests, e.g. python setup.py test
 script: tox
