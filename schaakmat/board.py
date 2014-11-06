@@ -170,7 +170,7 @@ def legal_moves(origin, position):
                          or
                          half_offset in under_siege)):
                 continue
-        elif is_check(do_move(move, position, force=True)):
+        elif is_check(team, do_move(move, position, force=True)):
             continue
 
         yield move
@@ -204,10 +204,9 @@ def is_check(team, position):
 
     under_siege = besieged(team, position)
 
-    for index in position.board:
-        piece = get_piece(index, position.board)
+    for i, piece in enumerate(position.board):
         if piece in team and piece in KINGS:
-            if index in under_siege:
+            if i in under_siege:
                 return True
     return False
 
