@@ -332,7 +332,7 @@ def _accessible_moves(origin, position, capture_moves=False):
                         and get_piece(origin+WEST*3, position.board)
                         and not castling_rights(team, position).queenside):
                     break
-            if pawn:
+            elif pawn:
                 # Offset is not a move that can capture?
                 if capture_moves and offset in (NORTH, NORTH*2, SOUTH,
                                                 SOUTH*2):
