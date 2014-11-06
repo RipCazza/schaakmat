@@ -184,16 +184,8 @@ def besieged(team, position):
 
     for i, piece in enumerate(position.board):
         if piece in opposing_team:
-            pawn = piece in PAWNS
-            king = piece in KINGS
             for move in _accessible_moves(i, position, capture_moves=True):
                 destination = move.destination
-                if king or pawn:
-                    offset = move.origin - destination
-                    if offset in (NORTH*2, EAST*2, WEST*2, SOUTH*2):
-                        continue
-                    if pawn and offset in (NORTH, SOUTH):
-                        continue
                 if destination not in siege_set:
                     yield destination
                     siege_set.add(destination)
