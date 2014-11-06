@@ -112,10 +112,49 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(set(board.besieged(board.WHITES, position)), expected)
 
     def test_is_check(self):
-        pass
+        self.assertEqual(board.is_check(board.WHITES, board.INITIAL_POSITION),
+                         False)
+        self.assertEqual(board.is_check(board.BLACKS, board.INITIAL_POSITION),
+                         False)
 
     def test_is_move_legal(self):
         pass
+
+    def test_do_move(self):
+        expected_board = (
+            "♜♞♝♛♚♝♞♜"  # 0-7
+            "♟♟♟♟♟♟♟♟"  # 8-15
+            "        "  # 16-23
+            "        "  # 24-31
+            "♙       "  # 32-39
+            "        "  # 40-47
+            " ♙♙♙♙♙♙♙"  # 48-55
+            "♖♘♗♕♔♗♘♖"  # 56-63
+        )
+        expected = board.Position(expected_board, False,
+                                  board.CastlingRights(True, True),
+                                  board.CastlingRights(True, True),
+                                  40, 0, 0)
+        self.assertEqual(board.do_move(board.Move(48, 32),
+                                       board.INITIAL_POSITION),
+                         expected)
+
+        expected_board = (
+            "♜ ♝♛♚♝♞♜"  # 0-7
+            "♟♟♟♟♟♟♟♟"  # 8-15
+            "♞       "  # 16-23
+            "        "  # 24-31
+            "♙       "  # 32-39
+            "        "  # 40-47
+            " ♙♙♙♙♙♙♙"  # 48-55
+            "♖♘♗♕♔♗♘♖"  # 56-63
+        )
+        expected_2 = board.Position(expected_board, True,
+                                    board.CastlingRights(True, True),
+                                    board.CastlingRights(True, True),
+                                    None, 1, 1)
+        self.assertEqual(board.do_move(board.Move(1, 16), expected),
+                         expected_2)
 
     def test_to_index(self):
         notations = [letter + str(number) for number in reversed(range(1, 9))
@@ -136,3 +175,98 @@ class TestBoard(unittest.TestCase):
 
     def test__in_bounds(self):
         pass
+
+    def test__apply_move(self):
+        test_board = (
+            "♕       "  # 0-7
+            "        "  # 8-15
+            "        "  # 16-23
+            "        "  # 24-31
+            "        "  # 32-39
+            "        "  # 40-47
+            "        "  # 48-55
+            "        "  # 56-63
+        )
+        expected_board = (
+            "        "  # 0-7
+            "        "  # 8-15
+            "        "  # 16-23
+            "        "  # 24-31
+            "        "  # 32-39
+            "        "  # 40-47
+            "        "  # 48-55
+            "       ♕"  # 56-63
+        )
+        self.assertEqual(board._apply_move(board.Move(0, 63), test_board),
+                         expected_board)
+
+    def test__apply_move_replace(self):
+        test_board = (
+            "        "  # 0-7
+            " ♕      "  # 8-15
+            "        "  # 16-23
+            "        "  # 24-31
+            "        "  # 32-39
+            "        "  # 40-47
+            "      ♜ "  # 48-55
+            "        "  # 56-63
+        )
+        expected_board = (
+            "        "  # 0-7
+            "        "  # 8-15
+            "        "  # 16-23
+            "        "  # 24-31
+            "        "  # 32-39
+            "        "  # 40-47
+            "      ♕ "  # 48-55
+            "        "  # 56-63
+        )
+        self.assertEqual(board._apply_move(board.Move(9, 54), test_board),
+                         expected_board)
+
+    def test__place_piece(self):
+        test_board = (
+            "        "  # 0-7
+            "        "  # 8-15
+            "        "  # 16-23
+            "        "  # 24-31
+            "        "  # 32-39
+            "        "  # 40-47
+            "        "  # 48-55
+            "        "  # 56-63
+        )
+        expected_board = (
+            "♕       "  # 0-7
+            "        "  # 8-15
+            "        "  # 16-23
+            "        "  # 24-31
+            "        "  # 32-39
+            "        "  # 40-47
+            "        "  # 48-55
+            "        "  # 56-63
+        )
+        self.assertEqual(board._place_piece(0, '♕', test_board),
+                         expected_board)
+
+    def test__clear(self):
+        test_board = (
+            "♕       "  # 0-7
+            "        "  # 8-15
+            "        "  # 16-23
+            "        "  # 24-31
+            "        "  # 32-39
+            "        "  # 40-47
+            "        "  # 48-55
+            "        "  # 56-63
+        )
+        expected_board = (
+            "        "  # 0-7
+            "        "  # 8-15
+            "        "  # 16-23
+            "        "  # 24-31
+            "        "  # 32-39
+            "        "  # 40-47
+            "        "  # 48-55
+            "        "  # 56-63
+        )
+        self.assertEqual(board._clear(0, test_board), expected_board)
