@@ -3,17 +3,17 @@
 language: python
 
 env:
-  - TOX_ENV=py27
-  - TOX_ENV=py32
-  - TOX_ENV=py33
-  - TOX_ENV=py34
-  - TOX_ENV=pypy
-  - TOX_ENV=pypy3
-  - TOX_ENV=flake8
+  - TOXENV=py27
+  - TOXENV=py32
+  - TOXENV=py33
+  - TOXENV=py34
+  - TOXENV=pypy
+  - TOXENV=pypy3
+  - TOXENV=flake8
 
 install:
   - pip install -r requirements.txt
   - pip install tox
 
 # command to run tests, e.g. python setup.py test
-script: tox -e TOX_ENV
+script: tox
