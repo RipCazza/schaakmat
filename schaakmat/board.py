@@ -161,8 +161,8 @@ def legal_moves(origin, position):
 
     for move in _accessible_moves(origin, position):
         if king:
-            offset = move.origin - move.destination
-            half_offset = offset / 2
+            offset = move.destination - move.origin
+            half_offset = offset // 2
             if move.destination in under_siege:
                 continue
             if (offset in (EAST*2, WEST*2)
