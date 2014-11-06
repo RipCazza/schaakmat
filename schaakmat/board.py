@@ -26,7 +26,7 @@ class Position(namedtuple("Position", ["board", "whites_turn",
                                        "en_passant_target", "half_move_clock",
                                        "move_count"])):
     """Position is a tuple that can hold data about the state of a chess game.
-    It somewhat matches Forsytch-Edwards Notation in both state contents and
+    It somewhat matches Forsyth-Edwards Notation in both state contents and
     order.
 
     IMPORTANT: A chess position is a *state*, not a location.
