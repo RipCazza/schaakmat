@@ -177,7 +177,7 @@ INITIAL_POSITION = Position(board=INITIAL_BOARD, whites_turn=True,
                             castling_white=CastlingRights(True, True),
                             castling_black=CastlingRights(True, True),
                             en_passant_target=None, half_move_clock=0,
-                            move_count=0)
+                            move_count=1)
 
 
 def get_piece(index, board):

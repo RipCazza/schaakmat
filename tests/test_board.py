@@ -134,7 +134,7 @@ class TestBoard(unittest.TestCase):
         expected = board.Position(expected_board, False,
                                   board.CastlingRights(True, True),
                                   board.CastlingRights(True, True),
-                                  40, 0, 0)
+                                  40, 0, 1)
         self.assertEqual(board.do_move(board.Move(48, 32),
                                        board.INITIAL_POSITION),
                          expected)
@@ -152,7 +152,7 @@ class TestBoard(unittest.TestCase):
         expected_2 = board.Position(expected_board, True,
                                     board.CastlingRights(True, True),
                                     board.CastlingRights(True, True),
-                                    None, 1, 1)
+                                    None, 1, 2)
         self.assertEqual(board.do_move(board.Move(1, 16), expected),
                          expected_2)
 
