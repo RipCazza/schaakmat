@@ -125,7 +125,7 @@ WEST = -1
 #: move offsets as values (White).
 DIRECTIONS_WHITE = {
     KING_WHITE: set([NORTH, NORTH+EAST, EAST, EAST*2, SOUTH+EAST, SOUTH,
-                     SOUTH+WEST, WEST*2, NORTH+WEST]),
+                     SOUTH+WEST, WEST, WEST*2, NORTH+WEST]),
     QUEEN_WHITE: set([NORTH, NORTH+EAST, EAST, SOUTH+EAST, SOUTH, SOUTH+WEST,
                       WEST, NORTH+WEST]),
     ROOK_WHITE: set([NORTH, EAST, SOUTH, WEST]),
@@ -140,7 +140,7 @@ DIRECTIONS_WHITE = {
 #: move offsets as values (Black).
 DIRECTIONS_BLACK = {
     KING_BLACK: set([NORTH, NORTH+EAST, EAST, EAST*2, SOUTH+EAST, SOUTH,
-                     SOUTH+WEST, WEST*2, NORTH+WEST]),
+                     SOUTH+WEST, WEST, WEST*2, NORTH+WEST]),
     QUEEN_BLACK: set([NORTH, NORTH+EAST, EAST, SOUTH+EAST, SOUTH, SOUTH+WEST,
                       WEST, NORTH+WEST]),
     ROOK_BLACK: set([NORTH, EAST, SOUTH, WEST]),
