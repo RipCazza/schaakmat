@@ -25,60 +25,104 @@ class Position(namedtuple("Position", ["board", "whites_turn",
                                        "castling_white", "castling_black",
                                        "en_passant_target", "half_move_clock",
                                        "move_count"])):
-    """Position is a tuple that can hold data about the state of a chess game.
-    It somewhat matches Forsyth-Edwards Notation in both state contents and
-    order.
+    """Tuple that holds data about the state of a chess game. It somewhat
+    matches Forsyth-Edwards Notation in both state contents and order.
 
-    IMPORTANT: A chess position is a *state*, not a location.
+    .. IMPORTANT::
+        A chess position is a *state*, not a location.
 
-    board - 64-character string that holds the board pieces as Unicode
-            characters, and empty squares as spaces. The first character is A8
-            on the chess board.
-    whites_turn - Boolean value of whether the current turn is white's turn.
-    castling_white - Sequence of two boolean values that determine the kingside
-                     and queenside castling rights of white.
-    castling_black - Sequence of two boolean values that determine the kingside
-                     and queenside castling rights of black.
-    en_passant_target - Index position of the spot behind the pawn that can be
-                        captured.
-    half_move_clock - Amount of half-moves since the last capture or pawn move.
-    move_count - Total amount of full moves.
+    :param str board: 64-character string that holds the board pieces as
+                      Unicode characters, and empty squares as spaces. The
+                      first character is A8 on the chess board.
+    :param bool whites_turn: Whether the current turn is white's turn.
+    :param castling_white: Sequence of two boolean values that determine the
+                           kingside and queenside castling rights of white.
+    :type castling_white: :class:`CastlingRights`
+    :param castling_black: Sequence of two boolean values that determine the
+                           kingside and queenside castling rights of black.
+    :type castling_black: :class:`CastlingRights`
+    :param int en_passant_target: Index position of the spot behind the pawn
+                                  that can be captured.
+    :param int half_move_clock: Amount of half-moves since the last capture or
+                                pawn move.
+    :param int move_count: Total amount of full moves.
     """
-    pass
 
-Move = namedtuple("Move", ["origin", "destination"])
 
-CastlingRights = namedtuple("CastlingRights", ["kingside", "queenside"])
+class Move(namedtuple("Move", ["origin", "destination"])):
+    """Tuple that holds data about a move from one index to another.
 
+    :param int origin: From-index.
+    :param int destination: To-index.
+    """
+
+
+class CastlingRights(namedtuple("CastlingRights", ["kingside", "queenside"])):
+    """Tuple that holds data about the castling rights in either direction.
+
+    :param bool kingside: Kingside castling rights.
+    :param bool queenside: Queenside castling rights.
+    """
+
+
+#: White king piece.
 KING_WHITE = '♔'
+#: White queen piece.
 QUEEN_WHITE = '♕'
+#: White rook piece.
 ROOK_WHITE = '♖'
+#: White bishop piece.
 BISHOP_WHITE = '♗'
+#: White knight piece.
 KNIGHT_WHITE = '♘'
+#: White pawn piece.
 PAWN_WHITE = '♙'
+#: Set of white pieces.
 WHITES = set([
     KING_WHITE, QUEEN_WHITE, ROOK_WHITE, BISHOP_WHITE, KNIGHT_WHITE, PAWN_WHITE
 ])
 
+#: Black king piece.
 KING_BLACK = '♚'
+#: Black queen piece.
 QUEEN_BLACK = '♛'
+#: Black rook piece.
 ROOK_BLACK = '♜'
+#: Black bishop piece.
 BISHOP_BLACK = '♝'
+#: Black knight piece.
 KNIGHT_BLACK = '♞'
+#: Black pawn piece.
 PAWN_BLACK = '♟'
+#: Set of black pieces.
 BLACKS = set([
     KING_BLACK, QUEEN_BLACK, ROOK_BLACK, BISHOP_BLACK, KNIGHT_BLACK, PAWN_BLACK
 ])
 
+#: Set of kings.
 KINGS = set([KING_WHITE, KING_BLACK])
+#: Set of queens.
 QUEENS = set([QUEEN_WHITE, QUEEN_BLACK])
+#: Set of rooks.
 ROOKS = set([ROOK_WHITE, ROOK_BLACK])
+#: Set of bishops.
 BISHOPS = set([BISHOP_WHITE, BISHOP_BLACK])
+#: Set of knights.
 KNIGHTS = set([KNIGHT_WHITE, KNIGHT_BLACK])
+#: Set of pawns.
 PAWNS = set([PAWN_WHITE, PAWN_BLACK])
 
-NORTH, EAST, SOUTH, WEST = -8, 1, 8, -1
+#: Distance to north square in 1D array.
+NORTH = -8
+#: Distance to east square in 1D array.
+EAST = 1
+#: Distance to south square in 1D array.
+SOUTH = 8
+#: Distance to west square in 1D array.
+WEST = -1
 
+#: Dictionary that holds string identifiers as keys, and sets of associated
+#: move offsets as values (White).
 DIRECTIONS_WHITE = {
     KING_WHITE: set([NORTH, NORTH+EAST, EAST, EAST*2, SOUTH+EAST, SOUTH,
                      SOUTH+WEST, WEST*2, NORTH+WEST]),
@@ -92,6 +136,8 @@ DIRECTIONS_WHITE = {
     PAWN_WHITE: set([NORTH, NORTH*2, NORTH+EAST, NORTH+WEST])
 }
 
+#: Dictionary that holds string identifiers as keys, and sets of associated
+#: move offsets as values (Black).
 DIRECTIONS_BLACK = {
     KING_BLACK: set([NORTH, NORTH+EAST, EAST, EAST*2, SOUTH+EAST, SOUTH,
                      SOUTH+WEST, WEST*2, NORTH+WEST]),
@@ -105,11 +151,16 @@ DIRECTIONS_BLACK = {
     PAWN_BLACK: set([SOUTH+EAST, SOUTH, SOUTH*2, SOUTH+WEST])
 }
 
+#: Index locations of all squares of the north border.
 BORDER_NORTH = set([i for i in range(8)])
+#: Index locations of all squares of the east border.
 BORDER_EAST = set([7+i*8 for i in range(8)])
+#: Index locations of all squares of the south border.
 BORDER_SOUTH = set([i for i in range(56, 64)])
+#: Index locations of all squares of the west border.
 BORDER_WEST = set([i*8 for i in range(8)])
 
+#: 64-character representation of starting board.
 INITIAL_BOARD = (
     "♜♞♝♛♚♝♞♜"  # 0-7
     "♟♟♟♟♟♟♟♟"  # 8-15
@@ -121,6 +172,7 @@ INITIAL_BOARD = (
     "♖♘♗♕♔♗♘♖"  # 56-63
 )
 
+#: Beginning position of a standard chess game.
 INITIAL_POSITION = Position(board=INITIAL_BOARD, whites_turn=True,
                             castling_white=CastlingRights(True, True),
                             castling_black=CastlingRights(True, True),
@@ -129,27 +181,76 @@ INITIAL_POSITION = Position(board=INITIAL_BOARD, whites_turn=True,
 
 
 def get_piece(index, board):
+    """Get the piece at the provided index on the board. Return an empty string
+    if the index points to an empty square.
+
+    :param int index: Index value from 0-63 pointing to a square on the board.
+    :param str board: 64-character chess board representation.
+    :return: Associated chess piece.
+    :rtype: str
+    """
     return board[index].strip()
 
 
 def active_team(whites_turn):
+    """Return the active team depending on whose turn it is.
+
+    :param bool whites_turn: Boolean value signifying whose turn it is.
+    :return: Active team.
+    :rtype: set
+    """
     return WHITES if whites_turn else BLACKS
 
 
 def opponent(team):
+    """Return the opposing team to the supplied team.
+
+    :param set team: Set of chess pieces of a team.
+    :return: Opposing team.
+    :rtype: set
+    """
     return BLACKS if team is WHITES else WHITES
 
 
 def directions(team):
+    """Return the directions associated with the team.
+
+    :param set team: Set of chess pieces of a team.
+    :return: Associated directions.
+    :rtype: dict"""
     return DIRECTIONS_WHITE if team is WHITES else DIRECTIONS_BLACK
 
 
 def castling_rights(team, position):
+    """Return the castling rights embedded in :class:`Position` of the supplied
+    team.
+
+    :param set team: Set of chess pieces of a team.
+    :param position: State of the game.
+    :type position: :class:`Position`
+    :return: Associated castling rights.
+    :rtype: :class:`CastlingRights`
+    """
     return (position.castling_white if team is WHITES
             else position.castling_black)
 
 
 def legal_moves(origin, position):
+    """Yield all legal moves of a piece at *index*.
+
+    Takes into account:
+      * Whether the move is actually possible.
+      * Whether the king moves to a square that is under siege.
+      * Whether the king tries to castle while under siege, or while the
+        square the king has to pass through is under siege.
+      * Whether the resulting move results in a check.
+
+    :param int origin: Index position on the board.
+    :param position: State of the game.
+    :type position: :class:`Position`
+    :return: All legal :class:`Moves <Move>`.
+    :rtype: :class:`generator`
+    """
     global NORTH, EAST, SOUTH, WEST
 
     piece = get_piece(origin, position.board)
@@ -177,6 +278,14 @@ def legal_moves(origin, position):
 
 
 def besieged(team, position):
+    """Yield all squares that are besieged by enemy pieces.
+
+    :param set team: Set of chess pieces of a team.
+    :param position: State of the game.
+    :type position: :class:`Position`
+    :return: Integer values of besieged squares.
+    :rtype: :class:`generator`
+    """
     global NORTH, EAST, SOUTH, WEST, KINGS, PAWNS
 
     opposing_team = opponent(team)
@@ -192,6 +301,14 @@ def besieged(team, position):
 
 
 def is_check(team, position):
+    """Determine whether the team is in check in the provided chess position.
+
+    :param set team: Set of chess pieces of a team.
+    :param position: State of the game.
+    :type position: :class:`Position`
+    :return: Whether the king of the provided team is in check.
+    :rtype: bool
+    """
     global KINGS
 
     under_siege = besieged(team, position)
@@ -204,6 +321,15 @@ def is_check(team, position):
 
 
 def is_move_legal(move, position):
+    """Determine whether the supplied move is legal.
+
+    :param move: Suggested move.
+    :type move: :class:`Move`
+    :param position: State of the game.
+    :type position: :class:`Position`
+    :return: Whether the move is legal.
+    :rtype: bool
+    """
     team = active_team(position.whites_turn)
     piece = get_piece(move.origin, position.board)
     destination_piece = get_piece(move.destination, position.board)
@@ -217,10 +343,32 @@ def is_move_legal(move, position):
 
 
 def do_move(move, position, force=False, promotion_piece=None):
+    """Apply a move to the board and return a new position based on the
+    implications of the move.
+
+    Also perform a check to confirm whether the supplied move is legal. This
+    check is ignored if *force* is :const:`True`.
+
+    An optional *promotion_piece* can be supplied in case a pawn is to be
+    promoted. If no *promotion_piece* is supplied, the promotion will default
+    to queen promotion.
+
+    :param move: Move to be applied.
+    :type move: :class:`Move`
+    :param position: State of the game.
+    :type position: :class:`Position`
+    :keyword bool force: Whether to force the function regardless of whether
+                         the move is legal.
+    :keyword str promotion_piece: Identifier of piece that pawn should be
+                                  promoted to.
+    :return: New chess position.
+    :rtype: :class:`Position`
+    :raise ValueError: Move is illegal.
+    """
     if force or is_move_legal(move, position):
         pass
     else:
-        raise Exception()  # TODO
+        raise ValueError()  # TODO
 
     origin, destination = move
     team = active_team(position.whites_turn)
@@ -272,6 +420,11 @@ def do_move(move, position, force=False, promotion_piece=None):
         elif offset in (SOUTH+EAST, SOUTH+WEST) and not destination_piece:
             board = _clear(destination + NORTH, board)
         if destination in chain(BORDER_NORTH, BORDER_SOUTH):
+            if not promotion_piece:
+                if team is WHITES:
+                    promotion_piece = QUEEN_WHITE
+                else:
+                    promotion_piece = QUEEN_BLACK
             board = _place_piece(destination, promotion_piece, board)
     if destination_piece:
         half_move_clock = 0
