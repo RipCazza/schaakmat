@@ -18,4 +18,4 @@ script: tox
 
 matrix:
   allow_failures:
-    - TOXENV: flake8
+    - env: TOXENV=flake8
